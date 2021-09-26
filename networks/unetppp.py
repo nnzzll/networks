@@ -68,7 +68,7 @@ class UNetPPP(nn.Module):
             self.out3 = nn.Conv2d(C, num_classes, 3, 1, 1, bias=bias)
             self.out4 = nn.Conv2d(C, num_classes, 3, 1, 1, bias=bias)
         else:
-            self.out = nn.Conv2d(C, num_classes, 3, bias=bias)
+            self.out = nn.Conv2d(C, num_classes, 3, 1, 1, bias=bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         e1 = self.encoder1(x)
