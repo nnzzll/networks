@@ -188,6 +188,8 @@ class CascadeUNet(nn.Module):
         self.unet2 = StageTwo(in_channels+num_classes, num_classes, dim, 32, dropout, bias, training)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        out = self.unet1(x)
-        out = self.unet2(torch.cat([out, x], dim=1))
-        return out
+        out1 = self.unet1(x)
+        out2 = self.unet2(torch.cat([out1, x], dim=1))
+        if self.training:
+            return out1, out2 # out1:Stage1 output,out2:deconv result and trilinear result
+        return out2 # Only Outputs deconv result
