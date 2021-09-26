@@ -4,7 +4,7 @@ Pytorch implementation of benchmark models for image segmentation
 - Models
     - [x] UNet
     - [x] UNet++
-    - [ ] UNet3+
+    - [x] UNet3+
     - [x] UNet3D
     - [x] VNet
 
