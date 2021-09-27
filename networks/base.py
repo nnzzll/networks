@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
-from typing import Dict, Type, Union
+from typing import Dict, Type, Union, Sequence, List
 
 
 CONV: Dict[int, Union[Type[nn.Conv2d], Type[nn.Conv3d]]] = {2: nn.Conv2d, 3: nn.Conv3d}
 DECONV: Dict[int, Union[Type[nn.ConvTranspose2d], Type[nn.ConvTranspose3d]]] = {2: nn.ConvTranspose2d, 3: nn.ConvTranspose3d}
+DOWN: Dict[int, Union[Type[nn.MaxPool2d], Type[nn.MaxPool3d]]] = {2: nn.MaxPool2d, 3: nn.MaxPool3d}
 DROPOUT: Dict[int, Union[Type[nn.Dropout2d], Type[nn.Dropout3d]]] = {2: nn.Dropout2d, 3: nn.Dropout3d}
 ACT: Dict[str, Union[Type[nn.ReLU],Type[nn.LeakyReLU],Type[nn.PReLU]]] = {'relu': nn.ReLU, 'leaky': nn.LeakyReLU, 'prelu': nn.PReLU}
 NORM: Dict[int, Dict[str,Union[Type[nn.modules.batchnorm._BatchNorm],Type[nn.modules.instancenorm._InstanceNorm],Type[nn.GroupNorm]]]] = {
@@ -31,6 +32,7 @@ class Block(nn.Module):
         stride: int = 1,
         padding: int = 1,
         bias: bool = False,
+        dropout: float = 0,
         act: str = "relu",
         norm: str = "batch",
         num_group: int = 8,
