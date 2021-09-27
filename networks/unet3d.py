@@ -49,10 +49,22 @@ class UNet3D(nn.Module):
             self.up2 = nn.ConvTranspose3d(n_filters[2], n_filters[1], 2, 2, bias=bias)
             self.up1 = nn.ConvTranspose3d(n_filters[1], n_filters[0], 2, 2, bias=bias)
         else:
-            self.up4 = nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True)
-            self.up3 = nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True)
-            self.up2 = nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True)
-            self.up1 = nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True)
+            self.up4 = nn.Sequential(
+                nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True),
+                nn.Conv3d(n_filters[4],n_filters[3],1,bias=bias)
+            )
+            self.up3 = nn.Sequential(
+                nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True),
+                nn.Conv3d(n_filters[3],n_filters[2],1,bias=bias)
+            )
+            self.up2 = nn.Sequential(
+                nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True),
+                nn.Conv3d(n_filters[2],n_filters[1],1,bias=bias)
+            )
+            self.up1 = nn.Sequential(
+                nn.Upsample(scale_factor=2,mode='trilinear',align_corners=True),
+                nn.Conv3d(n_filters[1],n_filters[0],1,bias=bias)
+            )
 
         if deep_supervision:
             self.out1 = nn.Conv3d(n_filters[0], num_classes, 1, bias=bias)
