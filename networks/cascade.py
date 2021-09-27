@@ -19,24 +19,24 @@ class StageOne(nn.Module):
             CONV[dim](in_channels, base_filters, 3, 1, 1, bias=bias),
             DROPOUT[dim](dropout, True),
         )
-        self.encoder1 = Block(base_filters, base_filters, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
+        self.encoder1 = Block(base_filters, base_filters, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
         self.encoder2 = nn.Sequential(
-            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
         self.encoder3 = nn.Sequential(
-            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
         self.bottleneck = nn.Sequential(
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
-        self.decoder3 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-        self.decoder2 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-        self.decoder1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, 'relu', 'group', 8, True, True)
+        self.decoder3 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout,'relu', 'group', 8, True, True)
+        self.decoder2 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout,'relu', 'group', 8, True, True)
+        self.decoder1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, dropout, 'relu', 'group', 8, True, True)
 
         self.out_conv = CONV[dim](base_filters, num_classes, 1, 1, bias=bias)
 
@@ -79,32 +79,32 @@ class StageTwo(nn.Module):
         base_filters: int = 32,
         dropout: float = 0.2,
         bias: bool = False,
-        training: bool = True,
+        training_flag: bool = True,
     ) -> None:
         super().__init__()
-        self.training = training
+        self.training_flag = training_flag
         self.init_conv = nn.Sequential(
             CONV[dim](in_channels, base_filters, 3, 1, 1, bias=bias),
             DROPOUT[dim](dropout, True),
         )
-        self.encoder1 = Block(base_filters, base_filters, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
+        self.encoder1 = Block(base_filters, base_filters, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
         self.encoder2 = nn.Sequential(
-            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
         self.encoder3 = nn.Sequential(
-            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
         self.bottleneck = nn.Sequential(
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
-            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
+            Block(base_filters*8, base_filters*8, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True),
         )
-        self.decoder3 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-        self.decoder2 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-        self.decoder1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, 'relu', 'group', 8, True, True)
+        self.decoder3 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
+        self.decoder2 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
+        self.decoder1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, dropout, 'relu', 'group', 8, True, True)
 
         self.out_conv = CONV[dim](base_filters, num_classes, 1, 1, bias=bias)
 
@@ -125,10 +125,10 @@ class StageTwo(nn.Module):
             DECONV[dim](base_filters, base_filters, 2, 2, bias=bias)
         )
 
-        if training:
-            self.decoder3_1 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-            self.decoder2_1 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, 'relu', 'group', 8, True, True)
-            self.decoder1_1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, 'relu', 'group', 8, True, True)
+        if training_flag:
+            self.decoder3_1 = Block(base_filters*4, base_filters*4, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
+            self.decoder2_1 = Block(base_filters*2, base_filters*2, dim, 3, 1, 1, bias, dropout, 'relu', 'group', 8, True, True)
+            self.decoder1_1 = Block(base_filters, base_filters, dim, 3, 1, 1,  bias, dropout, 'relu', 'group', 8, True, True)
             self.up3_1 = nn.Sequential(
                 CONV[dim](base_filters*8, base_filters*4, 1, 1, bias=bias),
                 nn.Upsample(scale_factor=2, mode='trilinear', align_corners=True) if dim == 3 else nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True),
@@ -153,7 +153,7 @@ class StageTwo(nn.Module):
         out2 = self.decoder2(skip2+self.up2(out3))
         out1 = self.decoder1(skip1+self.up1(out2))
         out = self.out_conv(out1)
-        if self.training:
+        if self.training_flag:
             out3_1 = self.decoder3_1(skip3+self.up3_1(bottle))
             out2_1 = self.decoder2_1(skip2+self.up2_1(out3_1))
             out1_1 = self.decoder1_1(skip1+self.up1_1(out2_1))
@@ -170,7 +170,7 @@ class CascadeUNet(nn.Module):
         dim: int = 3,
         dropout: float = 0.2,
         bias: bool = False,
-        training: bool = True,
+        training_flag: bool = True,
     ) -> None:
         '''
         Two-Stage Cascaded U-Net: 1st Place Solution to BraTS Challenge 2019 Segmentation Task
@@ -181,11 +181,11 @@ class CascadeUNet(nn.Module):
             num_classes: Number of classes to segment.
             dim: Dimension. 2D or 3D segmentation.
             dropout: Dropout rate.
-            training: If true, there are 2 decoder path in the stage2 Unet.
+            training_flag: If true, there are 2 decoder path in the stage2 Unet.
         '''
         super().__init__()
         self.unet1 = StageOne(in_channels, num_classes, dim, 16, dropout, bias)
-        self.unet2 = StageTwo(in_channels+num_classes, num_classes, dim, 32, dropout, bias, training)
+        self.unet2 = StageTwo(in_channels+num_classes, num_classes, dim, 32, dropout, bias, training_flag)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out1 = self.unet1(x)
