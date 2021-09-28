@@ -38,6 +38,7 @@ class Block(nn.Module):
         num_group: int = 8,
         pre_norm: bool = False,
         res: bool = False,
+        down: bool = False,
     ) -> None:
         '''Base Block for UNet-Like network
 
@@ -49,31 +50,38 @@ class Block(nn.Module):
             stride: Stride of the convolution.
             padding: Zero-padding added to both sides of the input.
             bias: If ``True``, adds a learnable bias to the output.
+            dropout: Dropout rate.
             act: Activation function of Block.``relu``,``prelu`` or ``leaky``.
             norm: Normalization type.``batch``,``group`` or ``instance``.
             num_group: number of groups to separate the channels into
             pre_norm: If true, normalization->activation->convolution.
-            res:If true, set residual-connection to block.
+            res: If true, set residual-connection to block.
+            down: If true, first conv layer used as downsample layer
         '''
         super().__init__()
         self._check_param(dim, act, norm)
         self.res = res
-
+        stride1 = stride if not down else kernel_size//2+1
+        stride2 = stride
         if pre_norm:
             self.conv_x2 = nn.Sequential(
                 NORM[dim][norm](num_group, in_channels) if norm == 'group' else NORM[dim][norm](in_channels),
                 ACT[act](inplace=True),
-                CONV[dim](in_channels, out_channels, kernel_size, stride, padding, bias=bias),
+                CONV[dim](in_channels, out_channels, kernel_size, stride1, padding, bias=bias),
+                DROPOUT[dim](dropout,True),
                 NORM[dim][norm](num_group, out_channels) if norm == 'group' else NORM[dim][norm](out_channels),
                 ACT[act](inplace=True),
-                CONV[dim](out_channels, out_channels, kernel_size, stride, padding, bias=bias),
+                CONV[dim](out_channels, out_channels, kernel_size, stride2, padding, bias=bias),
+                DROPOUT[dim](dropout,True),
             )
         else:
             self.conv_x2 = nn.Sequential(
-                CONV[dim](in_channels, out_channels, kernel_size, stride, padding, bias=bias),
+                CONV[dim](in_channels, out_channels, kernel_size, stride1, padding, bias=bias),
+                DROPOUT[dim](dropout,True),
                 NORM[dim][norm](num_group, out_channels) if norm == 'group' else NORM[dim][norm](out_channels),
                 ACT[act](inplace=True),
-                CONV[dim](out_channels, out_channels, kernel_size, stride, padding, bias=bias),
+                CONV[dim](out_channels, out_channels, kernel_size, stride2, padding, bias=bias),
+                DROPOUT[dim](dropout,True),
                 NORM[dim][norm](num_group, out_channels) if norm == 'group' else NORM[dim][norm](out_channels),
                 ACT[act](inplace=True),
             )
