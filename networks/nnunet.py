@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 
 from .base import *
+from torch.utils.checkpoint import checkpoint
 
 
 class nnUNet(nn.Module):
@@ -17,9 +18,11 @@ class nnUNet(nn.Module):
         act: str = 'leaky',
         norm: str = 'instance',
         deep_supervision: bool = False,
-    ):
+        checkpoint:bool = False,
+    ) -> None:
         super().__init__()
         self.deep_supervision = deep_supervision
+        self.checkpoint = checkpoint
         n_filters = [32, 64, 128, 256, 320, 320]
         self.in_conv = Block(in_channels,n_filters[0],dim,3,1,1,bias,dropout,act,norm)
 
@@ -47,18 +50,18 @@ class nnUNet(nn.Module):
 
 
     def forward(self, x: torch.Tensor)->Union[torch.Tensor,Sequence[torch.Tensor]]:
-        e1 = self.in_conv(x)
-        e2 = self.down1(e1)
-        e3 = self.down2(e2)
-        e4 = self.down3(e3)
-        e5 = self.down4(e4)
-        bottleneck = self.down5(e5)
+        e1 = self.in_conv(x) if not self.checkpoint else checkpoint(self.in_conv,x)
+        e2 = self.down1(e1) if not self.checkpoint else checkpoint(self.down1,e1)
+        e3 = self.down2(e2) if not self.checkpoint else checkpoint(self.down2,e2)
+        e4 = self.down3(e3) if not self.checkpoint else checkpoint(self.down3,e3)
+        e5 = self.down4(e4) if not self.checkpoint else checkpoint(self.down4,e4)
+        bottleneck = self.down5(e5) if not self.checkpoint else checkpoint(self.down5,e5)
         
-        d5 = self.decoder5(torch.cat([self.up5(bottleneck),e5],dim=1))
-        d4 = self.decoder4(torch.cat([self.up4(d5),e4],dim=1))
-        d3 = self.decoder3(torch.cat([self.up3(d4),e3],dim=1))
-        d2 = self.decoder2(torch.cat([self.up2(d3),e2],dim=1))
-        d1 = self.decoder1(torch.cat([self.up1(d2),e1],dim=1))
+        d5 = self.decoder5(torch.cat([self.up5(bottleneck),e5],dim=1)) if not self.checkpoint else checkpoint(self.decoder5,torch.cat([self.up5(bottleneck),e5],dim=1))
+        d4 = self.decoder4(torch.cat([self.up4(d5),e4],dim=1)) if not self.checkpoint else checkpoint(self.decoder4,torch.cat([self.up4(d5),e4],dim=1))
+        d3 = self.decoder3(torch.cat([self.up3(d4),e3],dim=1)) if not self.checkpoint else checkpoint(self.decoder3,torch.cat([self.up3(d4),e3],dim=1))
+        d2 = self.decoder2(torch.cat([self.up2(d3),e2],dim=1)) if not self.checkpoint else checkpoint(self.decoder2,torch.cat([self.up2(d3),e2],dim=1))
+        d1 = self.decoder1(torch.cat([self.up1(d2),e1],dim=1)) if not self.checkpoint else checkpoint(self.decoder1,torch.cat([self.up1(d2),e1],dim=1))
         
         if self.training and self.deep_supervision:
             out = [self.ds[0](d1),self.ds[1](d2),self.ds[2](d3)]
